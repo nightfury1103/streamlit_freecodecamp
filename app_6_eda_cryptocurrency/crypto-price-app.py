@@ -58,12 +58,9 @@ def load_data():
     soup = BeautifulSoup(cmc.content, 'html.parser')
 
     data = soup.find('script', id='__NEXT_DATA__', type='application/json')
-    coins = {}
     coin_data = json.loads(data.contents[0])
     listings = coin_data['props']['initialState']['cryptocurrency']['listingLatest']['data']
-    for i in listings:
-      coins[str(i['id'])] = i['slug']
-
+    coins = {str(i['id']): i['slug'] for i in listings}
     coin_name = []
     coin_symbol = []
     market_cap = []
@@ -116,7 +113,10 @@ selected_percent_timeframe = percent_dict[percent_timeframe]
 sort_values = col1.selectbox('Sort values?', ['Yes', 'No'])
 
 col2.subheader('Price Data of Selected Cryptocurrency')
-col2.write('Data Dimension: ' + str(df_selected_coin.shape[0]) + ' rows and ' + str(df_selected_coin.shape[1]) + ' columns.')
+col2.write(
+    f'Data Dimension: {str(df_selected_coin.shape[0])} rows and {str(df_selected_coin.shape[1])} columns.'
+)
+
 
 col2.dataframe(df_coins)
 
@@ -125,8 +125,7 @@ col2.dataframe(df_coins)
 def filedownload(df):
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
-    href = f'<a href="data:file/csv;base64,{b64}" download="crypto.csv">Download CSV File</a>'
-    return href
+    return f'<a href="data:file/csv;base64,{b64}" download="crypto.csv">Download CSV File</a>'
 
 col2.markdown(filedownload(df_selected_coin), unsafe_allow_html=True)
 
@@ -150,7 +149,6 @@ if percent_timeframe == '7d':
     plt.figure(figsize=(5,25))
     plt.subplots_adjust(top = 1, bottom = 0)
     df_change['percent_change_7d'].plot(kind='barh', color=df_change.positive_percent_change_7d.map({True: 'g', False: 'r'}))
-    col3.pyplot(plt)
 elif percent_timeframe == '24h':
     if sort_values == 'Yes':
         df_change = df_change.sort_values(by=['percent_change_24h'])
@@ -158,7 +156,6 @@ elif percent_timeframe == '24h':
     plt.figure(figsize=(5,25))
     plt.subplots_adjust(top = 1, bottom = 0)
     df_change['percent_change_24h'].plot(kind='barh', color=df_change.positive_percent_change_24h.map({True: 'g', False: 'r'}))
-    col3.pyplot(plt)
 else:
     if sort_values == 'Yes':
         df_change = df_change.sort_values(by=['percent_change_1h'])
@@ -166,4 +163,5 @@ else:
     plt.figure(figsize=(5,25))
     plt.subplots_adjust(top = 1, bottom = 0)
     df_change['percent_change_1h'].plot(kind='barh', color=df_change.positive_percent_change_1h.map({True: 'g', False: 'r'}))
-    col3.pyplot(plt)
+
+col3.pyplot(plt)

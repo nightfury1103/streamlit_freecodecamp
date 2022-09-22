@@ -20,13 +20,12 @@ selected_year = st.sidebar.selectbox('Year', list(reversed(range(1990,2020))))
 # https://www.pro-football-reference.com/years/2019/rushing.htm
 @st.cache
 def load_data(year):
-    url = "https://www.pro-football-reference.com/years/" + str(year) + "/rushing.htm"
+    url = f"https://www.pro-football-reference.com/years/{str(year)}/rushing.htm"
     html = pd.read_html(url, header = 1)
     df = html[0]
     raw = df.drop(df[df.Age == 'Age'].index) # Deletes repeating headers in content
     raw = raw.fillna(0)
-    playerstats = raw.drop(['Rk'], axis=1)
-    return playerstats
+    return raw.drop(['Rk'], axis=1)
 playerstats = load_data(selected_year)
 
 # Sidebar - Team selection
@@ -41,7 +40,10 @@ selected_pos = st.sidebar.multiselect('Position', unique_pos, unique_pos)
 df_selected_team = playerstats[(playerstats.Tm.isin(selected_team)) & (playerstats.Pos.isin(selected_pos))]
 
 st.header('Display Player Stats of Selected Team(s)')
-st.write('Data Dimension: ' + str(df_selected_team.shape[0]) + ' rows and ' + str(df_selected_team.shape[1]) + ' columns.')
+st.write(
+    f'Data Dimension: {str(df_selected_team.shape[0])} rows and {str(df_selected_team.shape[1])} columns.'
+)
+
 st.dataframe(df_selected_team)
 
 # Download NBA player stats data
@@ -49,8 +51,7 @@ st.dataframe(df_selected_team)
 def filedownload(df):
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
-    href = f'<a href="data:file/csv;base64,{b64}" download="playerstats.csv">Download CSV File</a>'
-    return href
+    return f'<a href="data:file/csv;base64,{b64}" download="playerstats.csv">Download CSV File</a>'
 
 st.markdown(filedownload(df_selected_team), unsafe_allow_html=True)
 
