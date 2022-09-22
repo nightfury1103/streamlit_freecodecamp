@@ -48,8 +48,7 @@ def user_input_features():
             'PTRATIO': PTRATIO,
             'B': B,
             'LSTAT': LSTAT}
-    features = pd.DataFrame(data, index=[0])
-    return features
+    return pd.DataFrame(data, index=[0])
 
 df = user_input_features()
 

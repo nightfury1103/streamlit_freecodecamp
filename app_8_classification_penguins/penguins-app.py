@@ -36,8 +36,7 @@ else:
                 'flipper_length_mm': flipper_length_mm,
                 'body_mass_g': body_mass_g,
                 'sex': sex}
-        features = pd.DataFrame(data, index=[0])
-        return features
+        return pd.DataFrame(data, index=[0])
     input_df = user_input_features()
 
 # Combines user input features with entire penguins dataset
@@ -58,12 +57,9 @@ df = df[:1] # Selects only the first row (the user input data)
 # Displays the user input features
 st.subheader('User Input features')
 
-if uploaded_file is not None:
-    st.write(df)
-else:
+if uploaded_file is None:
     st.write('Awaiting CSV file to be uploaded. Currently using example input parameters (shown below).')
-    st.write(df)
-
+st.write(df)
 # Reads in saved classification model
 load_clf = pickle.load(open('penguins_clf.pkl', 'rb'))
 
